@@ -1,4 +1,11 @@
 package com.example.L3Application.dto.response;
 
-public enum AvailableSlotsResponseDto {
-}
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+public record AvailableSlotsResponseDto(
+    LocalDate visitDate,
+    List<LocalTime>  availableSlots
+){}
+
