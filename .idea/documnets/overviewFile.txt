@@ -1,0 +1,36 @@
+There are the 3 roles---
+1) Patinet
+2) Front DeskCoordinator
+3) Clinician
+
+Now Special COordinAT ROP WILL alrefdy see the fulls cgedule and live quuee.
+(Cliccian Assistant) separete acc thta handles intake and patinet themselves(who uploads there own docs)
+
+
+a)User----(enum-PATIENT,FRONT_DESK
+_COORDINTAR, CLINCISAN)
+id,name,mial,pass,PhoneNo,role,add
+b)Appointment-id,(patinetId-Userfk),clinician Id,visitDate,timeSlot,type(revisit or firstVisit)
+Appointmnetstatus-BOOKED|INTAKE PENDING|CHECKED_IN|INPROGRESS|COMPLETED|CANCELLED|NO_SHOW)
+c)IntakeForm
+MedHistory,Reson,app_id
+d)DOcument
+patient_id,appoint_id documnet storage
+e)QueryENtry
+sattus(waiting|called|inroom|done)
+f)   visitSumarry/content
+
+contentclcicianid,appoitnid,contnent,
+g)
+
+Phase1--
+IntakeForm-Entities+ repository of whoever isonboarde
+-----flow will be like
+
+There will be no like somone will come and login and get token Patient will be having /auht/register api which through once registered with info while login get tokens and after sussceeful login he will egt mail
+appointmnet.patientId==currUser for not al aptinet can coe and logins dorectly
+3 roles only-----front_desk_coordinator
+
+
+GET/queue every few secondsor Server-Sent Event pushed on every QueueEntry mutation, payload scoped \server to client.
+
