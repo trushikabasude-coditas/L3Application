@@ -24,7 +24,7 @@ public static <T> ApiResponse<T>success(int status, String message,T data) {
             .data(data)
             .build();
 }
-    public static  ApiResponse<Object>errors(int status, String message,Object errors) {
+    public static  ApiResponse<Object> errors(int status, String message,Object errors) {
         return ApiResponse.builder()
                 .success(true)
                 .status(status)

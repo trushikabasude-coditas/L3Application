@@ -26,7 +26,7 @@ import java.time.LocalDate;
 public class AppointmentController {
     private final AppointmentService appointmentService;
 
-    @Operation(summary = "Get available slots for a date  ")
+  // @ManagedOperation(syummary)
     @GetMapping("/available-slots")
     public ResponseEntity<ApiResponse<AvailableSlotsResponseDto>> availableSlots(@Valid @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         AvailableSlotsResponseDto slots = appointmentService.getAvailableSlots(date);

@@ -1,4 +1,6 @@
 package com.example.L3Application.enums;
 
 public enum VisitType {
+    REVISIT,
+    FIRST_VISIT
 }
