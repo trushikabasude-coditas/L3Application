@@ -6,16 +6,11 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
-import static java.util.logging.Level.parse;
-
 @Component
 public class JwtTokenProvider implements TokenProvider {
-
     private final SecretKey key;
     private final Long expiration;
   public JwtTokenProvider(@Value("${app.jwt.secret}") String secret,

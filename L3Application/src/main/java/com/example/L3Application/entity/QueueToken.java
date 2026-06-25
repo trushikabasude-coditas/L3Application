@@ -16,15 +16,13 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "queue_token",uniqueConstraints = @UniqueConstraint(columnNames = {"issued_date","token_number"}))
-public class QueueToken {
-
+public class QueueToken{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 private int tokenNumber;
 @Column(name = "issue_date",nullable = false)
 private LocalDate issueDate;
-
 @OneToOne(fetch = FetchType.LAZY, optional = false)
 @JoinColumn(name = "appointment_id", unique = true)
 private Appointment appointment;

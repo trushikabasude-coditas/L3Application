@@ -12,7 +12,7 @@ import java.time.Instant;
 @Builder
 public class RefreshToken{
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String token;
     @ManyToOne(fetch = FetchType.LAZY)
 private UserEntity user;

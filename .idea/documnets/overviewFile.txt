@@ -5,8 +5,7 @@ There are the 3 roles---
 
 Now Special COordinAT ROP WILL alrefdy see the fulls cgedule and live quuee.
 (Cliccian Assistant) separete acc thta handles intake and patinet themselves(who uploads there own docs)
-
-
+/
 a)User----(enum-PATIENT,FRONT_DESK
 _COORDINTAR, CLINCISAN)
 id,name,mial,pass,PhoneNo,role,add

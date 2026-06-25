@@ -19,8 +19,8 @@ public class EmailService {
         send(to, "Your appointment is booked","Hi"+name+"\nYour appointment is confirmed for"+date+"and at"+time+                        ".\nPlease complete your intake before you arrive.\n\n— Threshold Clinic");
     }
     private void send(String to,String subject,String body){
-        try {
-            SimpleMailMessage msg = new SimpleMailMessage();
+try {
+      SimpleMailMessage msg=new SimpleMailMessage();
             msg.setTo(to);
             msg.setSubject(subject);
             msg.setText(body);
