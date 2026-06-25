@@ -6,13 +6,12 @@ import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
 import com.example.L3Application.email.EmailService;
 import com.example.L3Application.entity.Appointment;
-import com.example.L3Application.entity.User;
+import com.example.L3Application.entity.UserEntity;
 import com.example.L3Application.enums.AppointmentStatus;
 import com.example.L3Application.exception.ConflictException;
 import com.example.L3Application.exception.ForbiddenException;
 import com.example.L3Application.exception.ResourceNotFoundException;
 import com.example.L3Application.repo.AppointmentRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -42,7 +41,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }   return slots;
     }
     @Override
-    public AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto) throws BadRequestException {
+    public AppointmentResponseDto book(UserEntity patient, BookAppointmentRequestDto requestDto) throws BadRequestException {
 if(!generateClinicSlots().contains(requestDto.timeSlot())){
 throw new BadRequestException("Clinic is closed at this time.!");
 }
@@ -94,7 +93,7 @@ return new AppointmentResponseDto(
         return new AvailableSlotResponseDto(date, open);
     }
     @Override
-    public AppointmentResponseDto reschedule(User patient, Long id, RescheduleAppointmentRequestDto request) throws BadRequestException {
+    public AppointmentResponseDto reschedule(UserEntity patient, Long id, RescheduleAppointmentRequestDto request) throws BadRequestException {
         Appointment appointment=isThisMyAppointment(id,patient);
        if(appointment.getAppointmentStatus()!=AppointmentStatus.BOOKED){
             throw new ConflictException("Only booked appointment can be rescheduled");
@@ -115,7 +114,7 @@ return new AppointmentResponseDto(
 
 
     @Override
-    public void cancel(User patient, Long id){
+    public void cancel(UserEntity patient, Long id){
 Appointment appointment=isThisMyAppointment(id,patient);
 if(appointment.getAppointmentStatus()==AppointmentStatus.COMPLETED || appointment.getAppointmentStatus()==AppointmentStatus.CANCELLED){
 throw new ConflictException("You cant cancel this because it is"+ appointment.getAppointmentStatus());
@@ -125,11 +124,11 @@ appointment.setAppointmentStatus(AppointmentStatus.CANCELLED);
 
     @Override
     //@Transactional(readOnly=true)
-    public AppointmentResponseDto getMyAppointment(User patient, Long id) {
+    public AppointmentResponseDto getMyAppointment(UserEntity patient, Long id) {
         return toResponse(isThisMyAppointment(id,patient));
     }
 
-    private Appointment isThisMyAppointment(Long id, User patient) {
+    private Appointment isThisMyAppointment(Long id, UserEntity patient) {
  Appointment appointment=appointmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Appointment Not Found"));
  if(appointment.getPatient().getId().equals(patient.getId())){
  throw new ForbiddenException("This appointment isnt ypurs");
@@ -139,7 +138,7 @@ return appointment;
 
     @Override
     //@Transactional(readOnly=true)
-    public List<AppointmentResponseDto>myAppointments(User patient){
+    public List<AppointmentResponseDto>myAppointments(UserEntity patient){
 
         return appointmentRepository.findByPatientOrderByVisitDateDescTimeSlotDesc(patient)
                 .stream().map(this::toResponse).toList();

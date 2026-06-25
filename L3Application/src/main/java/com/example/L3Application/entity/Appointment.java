@@ -24,11 +24,11 @@ public class Appointment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id",nullable = false)//--one patinet can book multiple appointment
 
-    private User patient;
+    private UserEntity patient;
 
     @ManyToOne(fetch = FetchType.LAZY)//here at first there will be no clinician later it will be assignerd by the front desk
     @JoinColumn(name = "clinician_id")
-    private User clinician;
+    private UserEntity clinician;
 
     private LocalDate visitDate;
     private LocalTime timeSlot;

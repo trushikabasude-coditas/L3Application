@@ -2,7 +2,7 @@ package com.example.L3Application.controller.user;
 
 import com.example.L3Application.dto.response.ApiResponse;
 import com.example.L3Application.dto.response.UserResponseDto;
-import com.example.L3Application.entity.User;
+import com.example.L3Application.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
     public class UserController {
        // @Operation(summary = "My profile")
         @GetMapping("/me")
-        public ResponseEntity<ApiResponse<UserResponseDto>> me(@AuthenticationPrincipal User me) {
-            UserResponseDto dto = new UserResponseDto(
-                    me.getId(), me.getFirstName(), me.getLastName(),
-                    me.getEmail(), me.getPhoneNumber(), me.getRole());
+        public ResponseEntity<ApiResponse<UserResponseDto>> me
+        (@AuthenticationPrincipal UserEntity me){
+            UserResponseDto dto=new UserResponseDto(
+                    me.getId(),me.getFirstName(),me.getLastName(),
+                    me.getEmail(),me.getPhoneNumber(),me.getRole());
             return ResponseEntity.ok(ApiResponse.success(200, "OK", dto));
         }
-    }
 
 }

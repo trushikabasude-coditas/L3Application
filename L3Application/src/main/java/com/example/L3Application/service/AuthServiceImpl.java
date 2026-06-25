@@ -5,6 +5,7 @@ import com.example.L3Application.dto.request.RegisterRequestDto;
 import com.example.L3Application.dto.response.AuthResponseDto;
 import com.example.L3Application.dto.response.UserResponseDto;
 import com.example.L3Application.entity.RefreshToken;
+import com.example.L3Application.entity.UserEntity;
 import com.example.L3Application.enums.Roles;
 import com.example.L3Application.exception.DuplicateResourceNotFound;
 import com.example.L3Application.repo.UserRepository;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
@@ -30,9 +30,10 @@ public class AuthServiceImpl implements AuthService{
    @Transactional
     public UserResponseDto register(RegisterRequestDto request) {
         if (userRepo.existsByEmail(request.email())) {
-            throw new DuplicateResourceNotFound("Email already registered"+request.email());
-        } User user = User.builder()
-                .firstName(request.firstName())
+            throw new DuplicateResourceNotFound("Email already registered" + request.email());
+        }
+        UserEntity user= UserEntity.builder()
+               .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
                 .phoneNumber(request.phoneNumber())
@@ -51,7 +52,7 @@ public class AuthServiceImpl implements AuthService{
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
-        User user = (User) authentication.getPrincipal();
+        UserEntity user = (UserEntity) authentication.getPrincipal();
         String accessToken = tokenProvider.generateAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken = refreshTokenService.create(user);
         log.info("User {} logged in", user.getEmail());
@@ -62,7 +63,7 @@ public class AuthServiceImpl implements AuthService{
     @Transactional
     public AuthResponseDto refresh(String refreshToken) {
         RefreshToken stored = refreshTokenService.verify(refreshToken);
-        User user = stored.getUser();
+        UserEntity user = stored.getUser();
         String accessToken = tokenProvider.generateAccessToken(user.getEmail(), user.getRole().name());
         return AuthResponseDto.of(accessToken, stored.getToken());
     }
@@ -74,7 +75,7 @@ public class AuthServiceImpl implements AuthService{
         log.info("Refresh token invalidated");
     }
 
-    private UserResponseDto toDto(User u){
+    private UserResponseDto toDto(UserEntity u){
         return new UserResponseDto(u.getId(),u.getFirstName(),u.getLastName(),
                 u.getEmail(), u.getPhoneNumber(), u.getRole());
     }

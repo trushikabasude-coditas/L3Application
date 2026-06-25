@@ -1,6 +1,6 @@
-package com.example.L3Application.controller.auth;
+package com.example.L3Application;
 
-import com.example.L3Application.entity.User;
+import com.example.L3Application.entity.UserEntity;
 import com.example.L3Application.enums.Roles;
 import com.example.L3Application.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class DataSeeder implements CommandLineRunner {
     }
     private void seed(String email,String first,String last,Roles role){
         if (userRepository.existsByEmail(email))return;
-        userRepository.save(User.builder().firstName(first).lastName(last).email(email)
+        userRepository.save(UserEntity.builder().firstName(first).lastName(last).email(email)
                                   .password(passwordEncoder.encode("password"))
                                  .role(role).build());
     }

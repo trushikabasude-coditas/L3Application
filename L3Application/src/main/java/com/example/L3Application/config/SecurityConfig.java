@@ -2,7 +2,6 @@ package com.example.L3Application.config;
 
 import com.example.L3Application.security.JwtAuthenticationFilter;
 import com.example.L3Application.service.JpaUserDetailsService;
-import com.example.electricity.shared.filter.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -51,7 +50,7 @@ public class SecurityConfig {
     @Bean
     @Primary
     public AuthenticationManager authenticationManager() {
-       DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(customUserDetailService);
+       DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(jpaUserDetailService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(daoAuthenticationProvider);
     }
