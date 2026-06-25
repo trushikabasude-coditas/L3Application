@@ -36,17 +36,16 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
     private static List<LocalTime> generateClinicSlots() {
-        List<LocalTime>slots = new ArrayList<>();
-        LocalTime time = LocalTime.of(9, 0);
-        LocalTime end = LocalTime.of(17, 0);
-        while (time.isBefore(end)) {
+        List<LocalTime>slots=new ArrayList<>()
+        LocalTime time=LocalTime.of(9, 0);
+        LocalTime end=LocalTime.of(17, 0);
+        while (time.isBefore(end)){
             slots.add(time);
-            time = time.plusMinutes(30);
-        }
-        return slots;
+            time=time.plusMinutes(30);
+        }   return slots;
     }
     @Override
-    public AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto) {
+    public AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto) throws BadRequestException {
 
 if(!generateClinicSlots().contains(requestDto.timeSlot())){
 throw new BadRequestException("Clinic is closed at this time.!");
@@ -87,29 +86,45 @@ return new AppointmentResponseDto(
 
     @Override
     public AvailableSlotResponseDto getAvailableSlots(LocalDate date) throws BadRequestException {
-        if(date==null||date.isBefore(LocalDate.now())){
+        if (date == null || date.isBefore(LocalDate.now())) {
             throw new BadRequestException("please choses today or future dates!!");
         }
-        List<LocalTime> takenSlots=appointmentRepository.findAllByVisitDateAndAppointmentStatusNot(date,AppointmentStatus.CANCELLED)
+        List<LocalTime> takenSlots = appointmentRepository.findAllByVisitDateAndAppointmentStatusNot(date, AppointmentStatus.CANCELLED)
                 .stream().map(Appointment::getTimeSlot).toList();
-List<LocalTime> open =new ArrayList<>();
-for(LocalTime time: generateClinicSlots()) {
-    if (!takenSlots.contains(time)) open.add(time);//here only the yes comes in
+        List<LocalTime> open = new ArrayList<>();
+        for (LocalTime time : generateClinicSlots()) {
+            if (!takenSlots.contains(time)) open.add(time);//here only the yes comes in
+        }
+        return new AvailableSlotResponseDto(date, open);
+    }
+    @Override
+    public AppointmentResponseDto reschedule(User patient, Long id, RescheduleAppointmentRequestDto request) throws BadRequestException {
+        Appointment appointment=isThisMyAppointmnet(id,patient);
+       if(appointment.getAppointmentStatus()!=AppointmentStatus.BOOKED){
+            throw new ConflictException("Only booked appointment can be rescheduled");
+        }
+        if(!generateClinicSlots().contains(request.timeSlot())) {
+            throw new BadRequestException("That time isn't a valid clinic slot.");
+        }
+        boolean takenSlots = appointmentRepository.existsByVisitDateAndTimeSlotAndAppointmentStatusNot(
+                request.visitDate(),request.timeSlot(),AppointmentStatus.CANCELLED);
+        if (takenSlots){
+            throw new ConflictException("That new time slot is no longer available.");
+        }
+        appointment.setVisitDate(request
+                .visitDate());
+        appointment.setTimeSlot(request.timeSlot());
+        return toResponse(appointment);
+    }
+
+
+    @Override
+    public void cancel(User patient, Long id){
+Appointment appointment=isThisMyAppointmnet(id,patient);
+if(appointment.getAppointmentStatus()==AppointmentStatus.COMPLETED || appointment.getAppointmentStatus()==AppointmentStatus.CANCELLED){
+throw new ConflictException("You cant cancel this because it is"+ appointment.getAppointmentStatus());
 }
-return new AvailableSlotResponseDto(date,open);
-
-
-
-    }
-
-    @Override
-    public AppointmentResponseDto reschedule(User patient, Long id, RescheduleAppointmentRequestDto request) {
-        return null;
-    }
-
-    @Override
-    public void cancel(User user, Long id) {
-
+appointment.setAppointmentStatus(AppointmentStatus.CANCELLED);
     }
 
     @Override
@@ -119,13 +134,17 @@ return new AvailableSlotResponseDto(date,open);
     }
 
     private Appointment isThisMyAppointmnet(Long id, User patient) {
-Appointment appointment=appointmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Appointment Not Found"));
-if(appointment.getAppointmnetStatus)
+ Appointment appointment=appointmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Appointment Not Found"));
+ if(appointment.getPatient().getId().equals(patient.getId())){
+ throw new ForbiddenException("This appointment isnt ypurs");
+}
+return appointment;
     }
 
     @Override
     @Transactional(readOnly=true)
     public List<AppointmentResponseDto> myAppointments(User patient) {
-        return java.util.List.of();
+        return appointmentRepository.findByPatientOrderByVisitDateDescTimeSlotDesc(patient)
+                .stream().map(this::toResponse).toList();
     }
 }

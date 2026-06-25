@@ -10,6 +10,7 @@ import com.example.L3Application.service.AppointmentService;
 import com.example.L3Application.service.IntakeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ import java.util.List;
 @RequestMapping("/appointment")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
-@Tag(name="Appointment")
+//@Tag(name="Appointment")
 
 //Appointmnetcontroller is what everything a patient does with the visit like appointment book the slot,intake the form,get summary
 
@@ -38,13 +39,13 @@ public class AppointmentController {
 
   // @ManagedOperation(syummary)
     @GetMapping("/available-slots")
-    public ResponseEntity<ApiResponse<AvailableSlotResponseDto>> availableSlots(@Valid @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public ResponseEntity<ApiResponse<AvailableSlotResponseDto>> availableSlots(@Valid @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) throws BadRequestException {
         AvailableSlotResponseDto slots = appointmentService.getAvailableSlots(date);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Here are the available slots", slots));
     }
 
     @GetMapping("/book-slot")
-    public ResponseEntity<ApiResponse<AppointmentResponseDto>> book(@AuthenticationPrincipal User me, @Valid @RequestBody BookAppointmentRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<AppointmentResponseDto>> book(@AuthenticationPrincipal User me, @Valid @RequestBody BookAppointmentRequestDto requestDto) throws BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
                 HttpStatus.CREATED.value(), "Your Appointment is  booked", appointmentService.book(me, requestDto)));
@@ -57,7 +58,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.success(200, "OK", appointmentService.myAppointments(me)));
     }
 
-    @Operation(summary = "Get one of my appointments")
+   // @Operation(summary = "Get one of my appointments")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<AppointmentResponseDto>> getAppointmentById(@AuthenticationPrincipal User me, @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(200, "OK", appointmentService.getMyAppointment(me, id)));
@@ -66,7 +67,7 @@ public class AppointmentController {
     // @Operation(summary = "Reschedule my own appointment")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<AppointmentResponseDto>> reschedule(
-            @AuthenticationPrincipal User me ,@PathVariable Long id, @Valid @RequestBody RescheduleAppointmentRequestDto requestDto) {
+            @AuthenticationPrincipal User me ,@PathVariable Long id, @Valid @RequestBody RescheduleAppointmentRequestDto requestDto) throws BadRequestException {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Your appointment has been rescheduled!!", appointmentService.reschedule(me,id,requestDto)));
     }
 
@@ -75,9 +76,5 @@ public class AppointmentController {
     public ResponseEntity<ApiResponse<Void>> cancel(@AuthenticationPrincipal User me, @PathVariable Long id){
         appointmentService.cancel(me,id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Your appointment is successfully cancel!If any help ask us!!", null));
-    }
-
-    private User currentUser(Authentication authentication) {
-        return (User) authentication.getprincipal();
     }
 }

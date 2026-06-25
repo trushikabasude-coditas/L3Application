@@ -13,11 +13,11 @@ import java.util.List;
 
 public interface AppointmentService {
 
-    AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto);
+    AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto) throws BadRequestException;
 
     AvailableSlotResponseDto getAvailableSlots(LocalDate date) throws BadRequestException;
 
-    AppointmentResponseDto reschedule(User  patient, Long id,RescheduleAppointmentRequestDto request);
+    AppointmentResponseDto reschedule(User  patient, Long id,RescheduleAppointmentRequestDto request) throws BadRequestException;
 
     void cancel(User user, Long id);
 
