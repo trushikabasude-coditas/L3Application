@@ -26,7 +26,7 @@ public class Appointment {
 
     private User patient;
 
-    @ManyToOne(fetch = FetchType.LAZY)//here at forst there will be no clinician later it will be assignerd by the front desk
+    @ManyToOne(fetch = FetchType.LAZY)//here at first there will be no clinician later it will be assignerd by the front desk
     @JoinColumn(name = "clinician_id")
     private User clinician;
 

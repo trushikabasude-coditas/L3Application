@@ -6,21 +6,22 @@ import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
 import com.example.L3Application.entity.User;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService {
 
-    AppointmentResponseDto book(Object o, @Valid BookAppointmentRequestDto requestDto);
+    AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto);
 
-    AvailableSlotResponseDto getAvailableSlots(@Valid LocalDate date);
+    AvailableSlotResponseDto getAvailableSlots(LocalDate date) throws BadRequestException;
 
-    AppointmentResponseDto reschedule(Object o, Long id, @Valid RescheduleAppointmentRequestDto request);
+    AppointmentResponseDto reschedule(User  patient, Long id,RescheduleAppointmentRequestDto request);
 
     void cancel(User user, Long id);
 
-    AppointmentResponseDto getMyAppointment(User me, Long id);
+    AppointmentResponseDto getMyAppointment(User patient,Long id);
 
-    List<AppointmentResponseDto> myAppointments(User me);
+    List<AppointmentResponseDto> myAppointments(User patient);
 }

@@ -2,9 +2,12 @@ package com.example.L3Application.enums;
 
 public enum AppointmentStatus {
     BOOKED,
-    INTAKE_REMAINING,
-    CHECKED_IN,
     IN_PROGRESS,
+    CHECKED_IN,
     COMPLETED,
     CANCELLED,
+    NO_SHOW,
+    CALLED,
+
+
 }

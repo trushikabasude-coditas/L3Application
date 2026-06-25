@@ -4,4 +4,5 @@ public enum Roles {
     FRONT_DESK_COORDINATOR,
     PATIENT,
     CLINICIAN
+
    }

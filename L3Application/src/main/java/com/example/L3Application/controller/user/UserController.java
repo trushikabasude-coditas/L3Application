@@ -1,6 +1,7 @@
 package com.example.L3Application.controller.user;
 
 import com.example.L3Application.dto.response.ApiResponse;
+import com.example.L3Application.dto.response.UserResponseDto;
 import com.example.L3Application.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 @RestController @RequestMapping("/user")
-    @@RequiredArgsConstructor
+    @RequiredArgsConstructor
     @PreAuthorize("hasRole('PATIENT')")
-    @Tag(name = "User")
+    //@Tag(name = "User")
     public class UserController {
        // @Operation(summary = "My profile")
         @GetMapping("/me")
