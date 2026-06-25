@@ -9,6 +9,8 @@ import com.example.L3Application.entity.Appointment;
 import com.example.L3Application.entity.User;
 import com.example.L3Application.enums.AppointmentStatus;
 import com.example.L3Application.exception.ConflictException;
+import com.example.L3Application.exception.ForbiddenException;
+import com.example.L3Application.exception.ResourceNotFoundException;
 import com.example.L3Application.repo.AppointmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +30,10 @@ import java.util.List;
 //this service owns the patient facing
 public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
-   // private final QueueService queueService;
     private final EmailService emailService;
+
     private static List<LocalTime> generateClinicSlots() {
-        List<LocalTime>slots=new ArrayList<>()
+        List<LocalTime>slots=new ArrayList<>();
         LocalTime time=LocalTime.of(9, 0);
         LocalTime end=LocalTime.of(17, 0);
         while (time.isBefore(end)){
@@ -93,7 +95,7 @@ return new AppointmentResponseDto(
     }
     @Override
     public AppointmentResponseDto reschedule(User patient, Long id, RescheduleAppointmentRequestDto request) throws BadRequestException {
-        Appointment appointment=isThisMyAppointmnet(id,patient);
+        Appointment appointment=isThisMyAppointment(id,patient);
        if(appointment.getAppointmentStatus()!=AppointmentStatus.BOOKED){
             throw new ConflictException("Only booked appointment can be rescheduled");
         }
@@ -114,7 +116,7 @@ return new AppointmentResponseDto(
 
     @Override
     public void cancel(User patient, Long id){
-Appointment appointment=isThisMyAppointmnet(id,patient);
+Appointment appointment=isThisMyAppointment(id,patient);
 if(appointment.getAppointmentStatus()==AppointmentStatus.COMPLETED || appointment.getAppointmentStatus()==AppointmentStatus.CANCELLED){
 throw new ConflictException("You cant cancel this because it is"+ appointment.getAppointmentStatus());
 }
@@ -124,10 +126,10 @@ appointment.setAppointmentStatus(AppointmentStatus.CANCELLED);
     @Override
     //@Transactional(readOnly=true)
     public AppointmentResponseDto getMyAppointment(User patient, Long id) {
-        return toResponse(isThisMyAppointmnet(id,patient));
+        return toResponse(isThisMyAppointment(id,patient));
     }
 
-    private Appointment isThisMyAppointmnet(Long id, User patient) {
+    private Appointment isThisMyAppointment(Long id, User patient) {
  Appointment appointment=appointmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Appointment Not Found"));
  if(appointment.getPatient().getId().equals(patient.getId())){
  throw new ForbiddenException("This appointment isnt ypurs");
@@ -137,8 +139,10 @@ return appointment;
 
     @Override
     //@Transactional(readOnly=true)
-    public List<AppointmentResponseDto> myAppointments(User patient) {
+    public List<AppointmentResponseDto>myAppointments(User patient){
+
         return appointmentRepository.findByPatientOrderByVisitDateDescTimeSlotDesc(patient)
                 .stream().map(this::toResponse).toList();
     }
+
 }

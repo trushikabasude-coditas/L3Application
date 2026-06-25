@@ -1,5 +1,8 @@
 package com.example.L3Application.service;
 
+import com.example.L3Application.dto.request.LoginDto;
+import com.example.L3Application.dto.request.RegisterRequestDto;
+import com.example.L3Application.dto.response.AuthResponseDto;
 import com.example.L3Application.dto.response.UserResponseDto;
 
 public interface AuthService{

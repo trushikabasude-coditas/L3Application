@@ -40,11 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.warn("Could not authenticate token:{}",e.getMessage());
             }
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request,response);
     }
-    private String resolveToken(HttpServletRequest request)
-    {
+    private String resolveToken(HttpServletRequest request){
         String h=request.getHeader(HEADER);
-        return (h !=null && h.startsWith(PREFIX)?h.substring(PREFIX.length()):null);
+        return(h !=null && h.startsWith(PREFIX)?h.substring(PREFIX.length()):null);
     }
 }

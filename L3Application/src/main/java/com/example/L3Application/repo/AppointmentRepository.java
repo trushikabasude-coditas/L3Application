@@ -1,17 +1,17 @@
 package com.example.L3Application.repo;
 
 import com.example.L3Application.entity.Appointment;
+import com.example.L3Application.entity.User;
 import com.example.L3Application.enums.AppointmentStatus;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment,Long>{
-List<Appointment> findByPatientOrderByVisitDateDescTimeSlotDesc(User patient);
+List<Appointment>findByPatientOrderByVisitDateDescTimeSlotDesc(User patient);
 
 //booking times for date(to make it no for all pairs and alsoblock 2 at a time booking)
 

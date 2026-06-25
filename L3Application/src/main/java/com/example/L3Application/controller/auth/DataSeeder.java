@@ -1,8 +1,7 @@
-package com.example.L3Application.bootstrap;
+package com.example.L3Application.controller.auth;
 
 import com.example.L3Application.entity.User;
 import com.example.L3Application.enums.Roles;
-import com.example.L3Application.repo.UserRepo;
 import com.example.L3Application.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,15 +1,20 @@
 package com.example.L3Application.service;
 
-import com.example.L3Application.dto.request.RegisterRequest;
+import com.example.L3Application.dto.request.LoginDto;
+import com.example.L3Application.dto.request.RegisterRequestDto;
+import com.example.L3Application.dto.response.AuthResponseDto;
 import com.example.L3Application.dto.response.UserResponseDto;
+import com.example.L3Application.entity.RefreshToken;
 import com.example.L3Application.enums.Roles;
+import com.example.L3Application.exception.DuplicateResourceNotFound;
 import com.example.L3Application.repo.UserRepository;
 import com.example.L3Application.security.TokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.Token;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,9 +28,9 @@ public class AuthServiceImpl implements AuthService{
     private final AuthenticationManager authenticationManager;
    @Override
    @Transactional
-    public UserResponseDto register(RegisterRequest request) {
+    public UserResponseDto register(RegisterRequestDto request) {
         if (userRepo.existsByEmail(request.email())) {
-            throw new DuplicateResourceException("Email already registered: " + request.email());
+            throw new DuplicateResourceNotFound("Email already registered"+request.email());
         } User user = User.builder()
                 .firstName(request.firstName())
                 .lastName(request.lastName())
@@ -64,13 +69,13 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     @Transactional
-    public void logout(String refreshToken) {
+    public void logout(String refreshToken){
         refreshTokenService.delete(refreshToken);
         log.info("Refresh token invalidated");
     }
 
-    private UserResponseDto toDto(User u) {
-        return new UserResponseDto(u.getId(), u.getFirstName(), u.getLastName(),
+    private UserResponseDto toDto(User u){
+        return new UserResponseDto(u.getId(),u.getFirstName(),u.getLastName(),
                 u.getEmail(), u.getPhoneNumber(), u.getRole());
     }
 }
