@@ -13,8 +13,7 @@ import java.util.Date;
 public class JwtTokenProvider implements TokenProvider {
     private final SecretKey key;
     private final Long expiration;
-  public JwtTokenProvider(@Value("${app.jwt.secret}") String secret,
-          @Value("${app.jwt.access-expiration-ms}")long expiration) {
+  public JwtTokenProvider(@Value("${app.jwt.secret}") String secret,@Value("${app.jwt.access-expiration-ms}")long expiration) {
         this.key=Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 this.expiration=expiration;
     }

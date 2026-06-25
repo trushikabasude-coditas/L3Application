@@ -23,8 +23,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
  @Override
-  protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull FilterChain filterChain) throws ServletException, IOException {
-
+  protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                  @NonNull HttpServletResponse response,
+                                  @NonNull FilterChain filterChain)
+         throws ServletException, IOException {
         String token=resolveToken(request);
         if (token!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             try {String username=tokenProvider.extractUsername(token);

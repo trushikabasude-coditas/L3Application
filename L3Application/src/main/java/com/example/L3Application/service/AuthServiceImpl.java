@@ -17,10 +17,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthServiceImpl implements AuthService{
+public class  AuthServiceImpl implements AuthService{
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
@@ -48,23 +50,20 @@ public class AuthServiceImpl implements AuthService{
     @Override
     @Transactional
     public AuthResponseDto login(LoginDto request) {
-        // Delegates credential checking to Spring Security; throws AuthenticationException on failure.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
-
         UserEntity user = (UserEntity) authentication.getPrincipal();
         String accessToken = tokenProvider.generateAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken = refreshTokenService.create(user);
         log.info("User {} logged in", user.getEmail());
         return AuthResponseDto.of(accessToken, refreshToken);
     }
-
     @Override
     @Transactional
     public AuthResponseDto refresh(String refreshToken) {
         RefreshToken stored = refreshTokenService.verify(refreshToken);
         UserEntity user = stored.getUser();
-        String accessToken = tokenProvider.generateAccessToken(user.getEmail(), user.getRole().name());
+        String accessToken = tokenProvider.generateAccessToken(user.getEmail(),user.getRole().name());
         return AuthResponseDto.of(accessToken, stored.getToken());
     }
 
