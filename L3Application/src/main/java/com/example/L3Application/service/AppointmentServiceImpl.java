@@ -4,7 +4,6 @@ import com.example.L3Application.dto.request.BookAppointmentRequestDto;
 import com.example.L3Application.dto.request.RescheduleAppointmentRequestDto;
 import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
-import com.example.L3Application.dto.response.BookAppointmentResponse;
 import com.example.L3Application.email.EmailService;
 import com.example.L3Application.entity.Appointment;
 import com.example.L3Application.entity.User;
@@ -27,14 +26,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 //this service owns the patient facing
-
 public class AppointmentServiceImpl implements AppointmentService {
-
     private final AppointmentRepository appointmentRepository;
-    private final QueueService queueService;
+   // private final QueueService queueService;
     private final EmailService emailService;
-
-
     private static List<LocalTime> generateClinicSlots() {
         List<LocalTime>slots=new ArrayList<>()
         LocalTime time=LocalTime.of(9, 0);
@@ -46,7 +41,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
     @Override
     public AppointmentResponseDto book(User patient, BookAppointmentRequestDto requestDto) throws BadRequestException {
-
 if(!generateClinicSlots().contains(requestDto.timeSlot())){
 throw new BadRequestException("Clinic is closed at this time.!");
 }
@@ -128,7 +122,7 @@ appointment.setAppointmentStatus(AppointmentStatus.CANCELLED);
     }
 
     @Override
-    @Transactional(readOnly=true)
+    //@Transactional(readOnly=true)
     public AppointmentResponseDto getMyAppointment(User patient, Long id) {
         return toResponse(isThisMyAppointmnet(id,patient));
     }
@@ -142,7 +136,7 @@ return appointment;
     }
 
     @Override
-    @Transactional(readOnly=true)
+    //@Transactional(readOnly=true)
     public List<AppointmentResponseDto> myAppointments(User patient) {
         return appointmentRepository.findByPatientOrderByVisitDateDescTimeSlotDesc(patient)
                 .stream().map(this::toResponse).toList();
