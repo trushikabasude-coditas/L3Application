@@ -4,6 +4,7 @@ import com.example.L3Application.dto.request.BookAppointmentRequestDto;
 import com.example.L3Application.dto.request.RescheduleAppointmentRequestDto;
 import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
+import com.example.L3Application.dto.response.QueuePositionResponseDto;
 import com.example.L3Application.entity.UserEntity;
 import org.apache.coyote.BadRequestException;
 
@@ -25,4 +26,6 @@ public interface AppointmentService {
     List<AppointmentResponseDto> myAppointments(UserEntity patient);
 
     void checkIn(UserEntity me, Long id);
+
+    QueuePositionResponseDto queuePosition(UserEntity me, Long id);
 }

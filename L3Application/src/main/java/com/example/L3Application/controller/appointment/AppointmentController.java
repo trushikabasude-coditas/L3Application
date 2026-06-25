@@ -5,6 +5,7 @@ import com.example.L3Application.dto.request.RescheduleAppointmentRequestDto;
 import com.example.L3Application.dto.response.ApiResponse;
 import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
+import com.example.L3Application.dto.response.QueuePositionResponseDto;
 import com.example.L3Application.entity.UserEntity;
 import com.example.L3Application.service.AppointmentService;
 import com.example.L3Application.service.IntakeService;
@@ -76,13 +77,14 @@ public class AppointmentController {
         appointmentService.cancel(me,id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Your appointment is successfully cancel!If any help ask us!!", null));
     }
-    @PostMapping("/{id}/check-In")
+    @PostMapping("/{id}/check-In")//to join the queue
     public ResponseEntity<ApiResponse<Void>> checkIn(@AuthenticationPrincipal UserEntity me, @PathVariable Long id) {
         appointmentService.checkIn(me, id);
         return ResponseEntity.ok(ApiResponse.success(200, "Checked in", null));
     }
-    @GetMapping("/{id}/queue-position")
-    public ResponseEntity<ApiResponse<QueuePositionResponse>> queuePosition(
+    @GetMapping("/{id}/queue-position")//to know the place in thequeue
+
+    public ResponseEntity<ApiResponse<QueuePositionResponseDto>>queuePosition(
             @AuthenticationPrincipal UserEntity me, @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(200, "OK", appointmentService.queuePosition(me, id)));
     }

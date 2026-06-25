@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface QueueTokenRepo extends JpaRepository <QueueToken,Long>{
+public interface QueueTokenRepository extends JpaRepository<QueueToken,Long>{
     Optional<QueueToken> findByAppointment(Appointment appointment);
     List<QueueToken> findByIssueDateOrderByTokenNumberAsc(LocalDate issueDate);
 }

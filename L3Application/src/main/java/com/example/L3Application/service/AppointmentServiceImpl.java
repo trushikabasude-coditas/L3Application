@@ -4,6 +4,7 @@ import com.example.L3Application.dto.request.BookAppointmentRequestDto;
 import com.example.L3Application.dto.request.RescheduleAppointmentRequestDto;
 import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
+import com.example.L3Application.dto.response.QueuePositionResponseDto;
 import com.example.L3Application.email.EmailService;
 import com.example.L3Application.entity.Appointment;
 import com.example.L3Application.entity.UserEntity;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,6 +30,7 @@ import java.util.List;
 @Slf4j
 //this service owns the patient facing
 public class AppointmentServiceImpl implements AppointmentService {
+    private final QueueService queueService;
     private final AppointmentRepository appointmentRepository;
     private final EmailService emailService;
 
@@ -87,8 +90,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AvailableSlotResponseDto getAvailableSlots(LocalDate date) {
         if (date==null||date.isBefore(LocalDate.now())) {
             throw new com.example.L3Application.exception.BadRequestException("please choses today or future dates!!");
-        }
-        List<LocalTime> takenSlots = appointmentRepository.findAllByVisitDateAndAppointmentStatusNot(date, AppointmentStatus.CANCELLED)
+        }List<LocalTime> takenSlots = appointmentRepository.findAllByVisitDateAndAppointmentStatusNot(date, AppointmentStatus.CANCELLED)
                 .stream().map(Appointment::getTimeSlot).toList();
         List<LocalTime> open = new ArrayList<>();
         for (LocalTime time:generateClinicSlots()) {
@@ -116,8 +118,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setTimeSlot(request.timeSlot());
         return toResponse(appointment);
     }
-
-
     @Override
     public void cancel(UserEntity patient, Long id) {
         Appointment appointment = isThisMyAppointment(id, patient);
@@ -147,6 +147,26 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return appointmentRepository.findByPatientOrderByVisitDateDescTimeSlotDesc(patient)
                 .stream().map(this::toResponse).toList();
+    }
+    @Override
+    @Transactional
+    public void checkIn(UserEntity patient, Long id) {
+        Appointment appt = isThisMyAppointment(id, patient);
+        if (appt.getAppointmentStatus() != AppointmentStatus.BOOKED) {
+            throw new ConflictException("Cannot check in: the appointment is "+appt.getAppointmentStatus() + ".");
+        }
+        appt.setAppointmentStatus(AppointmentStatus.CHECKED_IN);
+        appt.setCheckedInAt(java.time.LocalDateTime.now());
+        queueService.issueToken(appt);   // hand out the next token number
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public QueuePositionResponseDto queuePosition(UserEntity patient, Long id) {
+        Appointment appt=isThisMyAppointment(id, patient);
+        if (appt.getAppointmentStatus() != AppointmentStatus.CHECKED_IN) {
+            throw new ConflictException("You're not in the queue (stzatus is "+appt.getAppointmentStatus() + ").");
+        }
+        return queueService.positionFor(appt);
     }
 
 }
