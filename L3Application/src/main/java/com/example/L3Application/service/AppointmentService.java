@@ -23,4 +23,6 @@ public interface AppointmentService {
     AppointmentResponseDto getMyAppointment(UserEntity patient, Long id);
 
     List<AppointmentResponseDto> myAppointments(UserEntity patient);
+
+    void checkIn(UserEntity me, Long id);
 }

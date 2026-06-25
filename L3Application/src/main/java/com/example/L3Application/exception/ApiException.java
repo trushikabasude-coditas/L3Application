@@ -7,6 +7,5 @@ private final HttpStatus status;
 public ApiException(HttpStatus status,String message){
 super(message);
 this.status=status;
-
-}
+  }
 }

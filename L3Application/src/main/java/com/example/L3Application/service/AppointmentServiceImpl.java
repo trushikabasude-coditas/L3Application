@@ -84,14 +84,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AvailableSlotResponseDto getAvailableSlots(LocalDate date) throws BadRequestException {
-        if (date == null || date.isBefore(LocalDate.now())) {
-            throw new BadRequestException("please choses today or future dates!!");
+    public AvailableSlotResponseDto getAvailableSlots(LocalDate date) {
+        if (date==null||date.isBefore(LocalDate.now())) {
+            throw new com.example.L3Application.exception.BadRequestException("please choses today or future dates!!");
         }
         List<LocalTime> takenSlots = appointmentRepository.findAllByVisitDateAndAppointmentStatusNot(date, AppointmentStatus.CANCELLED)
                 .stream().map(Appointment::getTimeSlot).toList();
         List<LocalTime> open = new ArrayList<>();
-        for (LocalTime time : generateClinicSlots()) {
+        for (LocalTime time:generateClinicSlots()) {
             if (!takenSlots.contains(time)) open.add(time);//here only the yes comes in
         }
         return new AvailableSlotResponseDto(date, open);
@@ -104,7 +104,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ConflictException("Only booked appointment can be rescheduled");
         }
         if (!generateClinicSlots().contains(request.timeSlot())) {
-            throw new BadRequestException("That time isn't a valid clinic slot.");
+            throw new com.example.L3Application.exception.BadRequestException("That time isn't a valid clinic slot.");
         }
         boolean takenSlots = appointmentRepository.existsByVisitDateAndTimeSlotAndAppointmentStatusNot(
                 request.visitDate(), request.timeSlot(), AppointmentStatus.CANCELLED);

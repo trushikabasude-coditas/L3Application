@@ -3,10 +3,10 @@ package com.example.L3Application.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.w3c.dom.DocumentType;
+import com.example.L3Application.enums.DocumentType;
 
 import java.time.LocalDateTime;
-
+@Entity
 @Getter
 @Setter
 

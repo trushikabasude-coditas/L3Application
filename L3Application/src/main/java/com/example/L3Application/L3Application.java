@@ -11,7 +11,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class L3Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(L3Application.class, args);
+
+        SpringApplication.run(L3Application.class, args);
 	}
 
 }

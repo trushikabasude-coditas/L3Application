@@ -9,7 +9,6 @@ import com.example.L3Application.dto.response.UserResponseDto;
 import com.example.L3Application.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
