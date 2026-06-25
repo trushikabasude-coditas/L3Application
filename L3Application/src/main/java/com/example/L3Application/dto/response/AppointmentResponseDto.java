@@ -16,7 +16,6 @@ public record AppointmentResponseDto (
         LocalDate visitDate,
         VisitType visitType,
         LocalTime timeSlot,
-
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ){}

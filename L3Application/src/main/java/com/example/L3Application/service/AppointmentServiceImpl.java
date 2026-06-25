@@ -1,6 +1,6 @@
 package com.example.L3Application.service;
 
-import com.example.L3Application.dto.response.AvailableSlotsResponseDto;
+import com.example.L3Application.dto.response.AvailableSlotResponseDto;
 import com.example.L3Application.dto.response.BookAppointmentResponse;
 import com.example.L3Application.repo.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 public class AppointmentServiceImpl implements AppointmentService {
   private final AppointmentRepository appointmentRepository;
   private final BookClinics bookClinicSlots;
-  private final AvailableSlotsResponseDto availableSlotsResponseDto;
+  private final AvailableSlotResponseDto availableSlotsResponseDto;
   private static List<LocalTime> generateClinicSlots() {
     List<LocalTime> slots=new ArrayList<>();
     LocalTime time = LocalTime.of(9, 0);
@@ -29,8 +29,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
     return List.copyOf(slots);
 }
-
-
 private final BookAppointmentResponse List.isEnable()
 
 }

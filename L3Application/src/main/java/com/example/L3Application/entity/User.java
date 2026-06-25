@@ -3,7 +3,14 @@ package com.example.L3Application.entity;
 import com.example.L3Application.enums.Roles;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -12,7 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "users")
 
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,10 +46,21 @@ private Roles role;
         this.createdAt = this.updatedAt=LocalDateTime.now();
     }
 
-    @PreUpdate
-    void onUpdate() {
-        this.updatedAt=LocalDateTime.now();
+    public String fullName(){
+        return lastName==null ? firstName : firstName+lastName;
     }
+    @Override
+    public String getUsername()
+    {
+        return email;
+
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities(){
+        return List.of(new SimpleGrantedAuthority("ROLE_"+ role.name()));
+
+    }
+
 
 
 
