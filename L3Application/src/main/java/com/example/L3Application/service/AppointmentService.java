@@ -6,8 +6,10 @@ import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
 import com.example.L3Application.dto.response.QueuePositionResponseDto;
 import com.example.L3Application.entity.UserEntity;
-import org.apache.coyote.BadRequestException;
+import com.example.L3Application.exception.BadRequestException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,4 +30,6 @@ public interface AppointmentService {
     void checkIn(UserEntity me, Long id);
 
     QueuePositionResponseDto queuePosition(UserEntity me, Long id);
+
+    String upload(Long appointmentId, String text, MultipartFile file) throws IOException;
 }

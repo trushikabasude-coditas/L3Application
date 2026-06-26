@@ -103,23 +103,8 @@ public class AppointmentController {
     }
 
     @PostMapping("/upload")
-    public String upload(@RequestParam("text") String text,@RequestParam("doc") MultipartFile file) throws Exception{
-        new File("uploads").mkdirs();
-        String storedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path target = Paths.get("uploads", storedName);
-        Appointment a=new Appointment();
-        a.setId(a.getId());
-        Files.copy(file.getInputStream(), target);
-        Document doc = new Document();
-        doc.setOriginalName(file.getOriginalFilename());
-        doc.setStoredName(target.toAbsolutePath().toString());
-        doc.setContentType(file.getContentType());
-        doc.setSize(file.getSize());
-        documentRepository.save(doc);
-        return "text is" + text + "id=" + doc.getId() + "path=" + doc.getStoredName();
+    public String upload( @RequestParam("appointmentId")Long appointmentId, @RequestParam("text") String text,@RequestParam("doc") MultipartFile file) throws Exception{
+        return appointmentService.upload(appointmentId,text,file);
     }
-//    @GetMapping("/getDoc/{id}")
-//    public String getDoc(@PathVariable Long id) {
-//        return documentRepository.findById(id).orElseThrow().getStoredName();
-//    }
+
 }

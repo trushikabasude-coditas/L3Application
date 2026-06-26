@@ -7,22 +7,31 @@ import com.example.L3Application.dto.response.AvailableSlotResponseDto;
 import com.example.L3Application.dto.response.QueuePositionResponseDto;
 import com.example.L3Application.email.EmailService;
 import com.example.L3Application.entity.Appointment;
+import com.example.L3Application.entity.Document;
 import com.example.L3Application.entity.UserEntity;
 import com.example.L3Application.enums.AppointmentStatus;
+import com.example.L3Application.exception.BadRequestException;
 import com.example.L3Application.exception.ConflictException;
 import com.example.L3Application.exception.ForbiddenException;
 import com.example.L3Application.exception.ResourceNotFoundException;
 import com.example.L3Application.repo.AppointmentRepository;
+import com.example.L3Application.repo.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -33,6 +42,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final QueueService queueService;
     private final AppointmentRepository appointmentRepository;
     private final EmailService emailService;
+    private final DocumentRepository documentRepository;
 
 
     private static final LocalTime CLINIC_OPEN = LocalTime.of(9, 0);
@@ -48,9 +58,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AppointmentResponseDto book(UserEntity patient, BookAppointmentRequestDto requestDto) throws BadRequestException {
+    public AppointmentResponseDto book(UserEntity patient, BookAppointmentRequestDto requestDto) throws com.example.L3Application.exception.BadRequestException {
         if (!generateClinicSlots().contains(requestDto.timeSlot())) {
-            throw new BadRequestException("Clinic is closed at this time.!");
+            throw new com.example.L3Application.exception.BadRequestException("Clinic is closed at this time.!");
         }
 //checking if that slot is vaccant or not
         boolean taken = appointmentRepository.existsByVisitDateAndTimeSlotAndAppointmentStatusNot(
@@ -168,5 +178,24 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         return queueService.positionFor(appt);
     }
+
+    @Override
+    public String upload(Long appointmentId, String text, MultipartFile file) throws IOException {
+        new File("uploads").mkdirs();
+        String storedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path target = Paths.get("uploads", storedName);
+        Files.copy(file.getInputStream(), target);
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        Document doc = new Document();
+        doc.setAppointment(appointment);
+        doc.setOriginalName(file.getOriginalFilename());
+        doc.setStoredName(target.toAbsolutePath().toString());
+        doc.setContentType(file.getContentType());
+        doc.setSize(file.getSize());
+        documentRepository.save(doc);
+        return "text is" + text + "id=" + doc.getId() + "path=" + doc.getStoredName();
+    }
+
 
 }
