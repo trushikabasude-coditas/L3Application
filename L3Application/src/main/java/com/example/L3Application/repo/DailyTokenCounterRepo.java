@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface DailyTokenCounterRepo extends JpaRepository<DailyTokenCounter,Long> {
+public interface DailyTokenCounterRepo extends JpaRepository<DailyTokenCounter,LocalDate> {
 @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from DailyTokenCounter c where c.issueDate =:date")
 Optional<DailyTokenCounter> findByIdForUpdate(@Param("date") LocalDate date);

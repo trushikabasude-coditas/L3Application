@@ -6,9 +6,13 @@ import com.example.L3Application.dto.response.ApiResponse;
 import com.example.L3Application.dto.response.AppointmentResponseDto;
 import com.example.L3Application.dto.response.AvailableSlotResponseDto;
 import com.example.L3Application.dto.response.QueuePositionResponseDto;
+import com.example.L3Application.entity.Appointment;
+import com.example.L3Application.entity.Document;
 import com.example.L3Application.entity.UserEntity;
+import com.example.L3Application.repo.AppointmentRepository;
+import com.example.L3Application.repo.DocumentRepository;
 import com.example.L3Application.service.AppointmentService;
-import com.example.L3Application.service.IntakeService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -18,9 +22,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/appointment")
@@ -33,22 +43,23 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
-    private final IntakeService intakeService;
-//    private final DocumentService documentService;
+    //    private final IntakeService intakeService;
+    private  final DocumentRepository documentRepository;
+    private final AppointmentRepository appointmentRepository;
+
 //    private final SummaryService summaryService;
 
-  // @ManagedOperation(syummary)
+    // @ManagedOperation(syummary)
     @GetMapping("/available-slots")
     public ResponseEntity<ApiResponse<AvailableSlotResponseDto>> availableSlots(@Valid @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) throws BadRequestException {
         AvailableSlotResponseDto slots = appointmentService.getAvailableSlots(date);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Here are the available slots", slots));
     }
-
-    @GetMapping("/book-slot")
+    @PostMapping("/book-slot")
     public ResponseEntity<ApiResponse<AppointmentResponseDto>> book(@AuthenticationPrincipal UserEntity me, @Valid @RequestBody BookAppointmentRequestDto requestDto) throws BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
-                HttpStatus.CREATED.value(), "Your Appointment is  booked", appointmentService.book(me, requestDto)));
+                        HttpStatus.CREATED.value(), "Your Appointment is  booked", appointmentService.book(me, requestDto)));
     }
     //also the lsit of all the past apintmnets of that particular user
 
@@ -58,7 +69,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.success(200, "OK", appointmentService.myAppointments(me)));
     }
 
-   // @Operation(summary = "Get one of my appointments")
+    // @Operation(summary = "Get one of my appointments")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<AppointmentResponseDto>> getAppointmentById(@AuthenticationPrincipal UserEntity me, @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(200, "OK", appointmentService.getMyAppointment(me, id)));
@@ -67,25 +78,48 @@ public class AppointmentController {
     // @Operation(summary = "Reschedule my own appointment")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<AppointmentResponseDto>> reschedule(
-            @AuthenticationPrincipal UserEntity me , @PathVariable Long id, @Valid @RequestBody RescheduleAppointmentRequestDto requestDto) throws BadRequestException {
-        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Your appointment has been rescheduled!!", appointmentService.reschedule(me,id,requestDto)));
+            @AuthenticationPrincipal UserEntity me, @PathVariable Long id, @Valid @RequestBody RescheduleAppointmentRequestDto requestDto) throws BadRequestException {
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Your appointment has been rescheduled!!", appointmentService.reschedule(me, id, requestDto)));
     }
 
     //cancel the appointment
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> cancel(@AuthenticationPrincipal UserEntity me, @PathVariable Long id){
-        appointmentService.cancel(me,id);
+    public ResponseEntity<ApiResponse<Void>> cancel(@AuthenticationPrincipal UserEntity me, @PathVariable Long id) {
+        appointmentService.cancel(me, id);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Your appointment is successfully cancel!If any help ask us!!", null));
     }
+
     @PostMapping("/{id}/check-In")//to join the queue
     public ResponseEntity<ApiResponse<Void>> checkIn(@AuthenticationPrincipal UserEntity me, @PathVariable Long id) {
         appointmentService.checkIn(me, id);
         return ResponseEntity.ok(ApiResponse.success(200, "Checked in", null));
     }
+
     @GetMapping("/{id}/queue-position")//to know the place in thequeue
 
-    public ResponseEntity<ApiResponse<QueuePositionResponseDto>>queuePosition(
+    public ResponseEntity<ApiResponse<QueuePositionResponseDto>> queuePosition(
             @AuthenticationPrincipal UserEntity me, @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(200, "OK", appointmentService.queuePosition(me, id)));
     }
+
+    @PostMapping("/upload")
+    public String upload(@RequestParam("text") String text,@RequestParam("doc") MultipartFile file) throws Exception{
+        new File("uploads").mkdirs();
+        String storedName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path target = Paths.get("uploads", storedName);
+        Appointment a=new Appointment();
+        a.setId(a.getId());
+        Files.copy(file.getInputStream(), target);
+        Document doc = new Document();
+        doc.setOriginalName(file.getOriginalFilename());
+        doc.setStoredName(target.toAbsolutePath().toString());
+        doc.setContentType(file.getContentType());
+        doc.setSize(file.getSize());
+        documentRepository.save(doc);
+        return "text is" + text + "id=" + doc.getId() + "path=" + doc.getStoredName();
+    }
+//    @GetMapping("/getDoc/{id}")
+//    public String getDoc(@PathVariable Long id) {
+//        return documentRepository.findById(id).orElseThrow().getStoredName();
+//    }
 }

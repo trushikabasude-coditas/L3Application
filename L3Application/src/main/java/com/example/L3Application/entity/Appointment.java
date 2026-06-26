@@ -3,7 +3,6 @@ package com.example.L3Application.entity;
 import com.example.L3Application.enums.AppointmentStatus;
 import com.example.L3Application.enums.VisitType;
 import jakarta.persistence.*;
-import jdk.jshell.Snippet;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,7 +21,7 @@ public class Appointment {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id",nullable = false)//--one patinet can book multiple appointment
+    @JoinColumn(name = "patient_id")//--one patinet can book multiple appointment
 
     private UserEntity patient;
 
@@ -37,13 +36,14 @@ public class Appointment {
     private VisitType visitType;
     @Enumerated(EnumType.STRING)
     private AppointmentStatus appointmentStatus;
-    @Column(name = "created-at")
-    private Snippet reasonForVisit;
+
+    private String reasonForVisit;
 
     @Column(name = "checked_in_at")
     private LocalDateTime checkedInAt;
     @Column(name = "reminder_sent")
     private boolean reminderSent;
+    @Column(name = "created-at")
     private LocalDateTime createdAt;
 
 @Column(name = "updated-at")

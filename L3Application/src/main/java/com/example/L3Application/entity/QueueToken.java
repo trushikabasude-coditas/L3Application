@@ -2,12 +2,8 @@ package com.example.L3Application.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.context.annotation.Fallback;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 //This is an Waiting Room Token ,When a patient checks in thenthey get the next number of the dayThis is the uniuee token so 2 users can nevr see the token of each other.ANd also front desk coordinator will see all the waiting queuue if the patients based on the issueddate ,tokenId
 @Entity
 @Getter

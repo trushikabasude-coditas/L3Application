@@ -135,8 +135,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private Appointment isThisMyAppointment(Long id, UserEntity patient) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Appointment Not Found"));
-        if (appointment.getPatient().getId().equals(patient.getId())) {
-            throw new ForbiddenException("This appointment isnt ypurs");
+        if (!appointment.getPatient().getId().equals(patient.getId())){
+            throw new ForbiddenException("This appointment is not  yours");
         }
         return appointment;
     }

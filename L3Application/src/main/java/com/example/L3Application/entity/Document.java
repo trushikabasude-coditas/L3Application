@@ -15,7 +15,7 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
  private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "appointment_id")
+  @JoinColumn(name = "appointment_id",nullable = false)
 private Appointment appointment;
 
 @Enumerated(EnumType.STRING)

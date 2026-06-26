@@ -6,7 +6,6 @@ import com.example.L3Application.entity.DailyTokenCounter;
 import com.example.L3Application.entity.QueueToken;
 import com.example.L3Application.enums.AppointmentStatus;
 import com.example.L3Application.repo.DailyTokenCounterRepo;
-import com.example.L3Application.repo.QueueTokenRepo;
 import com.example.L3Application.repo.QueueTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -19,7 +19,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String HEADER="Authorization";
-    private static final String PREFIX="Bearer";
+    private static final String PREFIX="Bearer ";
     private final TokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
  @Override
